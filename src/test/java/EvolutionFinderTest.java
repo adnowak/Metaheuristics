@@ -54,7 +54,7 @@ public class EvolutionFinderTest {
   public void findSolutionN32K5SwapTest(){
     Selection selectionStrategy = new Tournament(100);
     Mutation mutationStrategy = new Swap();
-    Crossover crossoverStrategy = new CycleCrossover();
+    Crossover crossoverStrategy = new OrderedCrossover();
     int generationsAmount = 100;
     int populationSize = 100;
     double crossoverProb = 0.7;

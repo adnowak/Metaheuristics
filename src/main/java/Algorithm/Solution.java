@@ -75,4 +75,14 @@ public class Solution {
   public void setPathAt(int index, City newCity) {
     this.path[index] = newCity;
   }
+
+  public boolean equals(Object object){
+    Solution solution = (Solution) object;
+    for(int i=0; i<solution.getPathWithoutNulls().length; i++){
+      if(!getPathWithoutNulls()[i].equals(solution.getPathWithoutNulls())){
+        return false;
+      }
+    }
+    return true;
+  }
 }
