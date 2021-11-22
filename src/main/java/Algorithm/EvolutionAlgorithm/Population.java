@@ -55,4 +55,18 @@ public class Population {
     }
     return Utils.calculateSD(fitnessArray);
   }
+
+  public String getStats(){
+    StringBuilder stats = new StringBuilder();
+    stats
+        .append(getBestIndividual().getFitness())
+        .append(";")
+        .append(getAverageFitness())
+        .append(";")
+        .append(getWorstIndividual().getFitness())
+        .append(";")
+        .append(getStandardDeviation())
+        .append("\n");
+    return stats.toString();
+  }
 }

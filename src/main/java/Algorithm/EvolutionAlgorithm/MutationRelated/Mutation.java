@@ -35,4 +35,6 @@ public abstract class Mutation {
       solution.setPathAt(i, citiesToGo.get(i));
     }
   }
+
+  public abstract double getDefaultProb();
 }

@@ -20,4 +20,11 @@ public class Swap extends Mutation{
 
     fixIndividual(solution);
   }
+
+  @Override
+  public double getDefaultProb() {
+    return 0.04;
+  }
+
+
 }

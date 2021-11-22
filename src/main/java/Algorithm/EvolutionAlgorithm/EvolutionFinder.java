@@ -1,23 +1,22 @@
 package Algorithm.EvolutionAlgorithm;
 
 import Algorithm.EvolutionAlgorithm.CrossoverRelated.Crossover;
-import Algorithm.EvolutionAlgorithm.CrossoverRelated.OrderedCrossover;
-import Algorithm.EvolutionAlgorithm.MutationRelated.Inversion;
 import Algorithm.EvolutionAlgorithm.MutationRelated.Mutation;
-import Algorithm.EvolutionAlgorithm.MutationRelated.Swap;
-import Algorithm.EvolutionAlgorithm.SelectionRelated.Roulette;
 import Algorithm.EvolutionAlgorithm.SelectionRelated.Selection;
-import Algorithm.EvolutionAlgorithm.SelectionRelated.Tournament;
-import Algorithm.GreedyFinder;
 import Algorithm.RandomFinder;
-import Model.Problem;
 import Algorithm.Solution;
+import Data.Research;
+import Model.Problem;
 import Algorithm.SolutionHeuristicStrategy;
 
 import Model.Utils;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class EvolutionFinder extends SolutionHeuristicStrategy {
+  private Research research;
   private Selection selectionStrategy;
   private Mutation mutationStrategy;
   private Crossover crossoverStrategy;
@@ -25,6 +24,7 @@ public class EvolutionFinder extends SolutionHeuristicStrategy {
   private int populationSize;
   private double crossoverProb;
   private double mutationProb;
+  private Population recentPopulation;
 
   public EvolutionFinder(Selection selectionStrategy, Mutation mutationStrategy, Crossover crossoverStrategy, int generationsAmount, int populationSize, double crossoverProb, double mutationProb) {
     this.selectionStrategy = selectionStrategy;
@@ -39,8 +39,7 @@ public class EvolutionFinder extends SolutionHeuristicStrategy {
   @Override
   public Solution findSolution(Problem problem) {
     ArrayList<Solution> recentGeneration = initiateIndividualsList(problem, populationSize);
-    Population recentPopulation = null;
-    System.out.println("Generation;Best;Avg;Worst;Std");
+    recentPopulation = null;
     for(int i=0; i<generationsAmount; i++){
       recentPopulation = new Population(recentGeneration);
       ArrayList<Solution> newGeneration = new ArrayList<>();
@@ -65,7 +64,7 @@ public class EvolutionFinder extends SolutionHeuristicStrategy {
       newGeneration.add(recentPopulation.getBestIndividual());
       newGeneration.add(recentPopulation.getGeneration().get(0));
       recentGeneration = newGeneration;
-      System.out.println(i+";"+recentPopulation.getBestIndividual().getFitness()+";"+recentPopulation.getAverageFitness()+";"+recentPopulation.getWorstIndividual().getFitness()+";"+recentPopulation.getStandardDeviation());
+      research.addToResearch(recentPopulation);
     }
 
     return recentPopulation.getBestIndividual();
@@ -73,10 +72,22 @@ public class EvolutionFinder extends SolutionHeuristicStrategy {
 
   private ArrayList<Solution> initiateIndividualsList(Problem problem, int populationSize) {
     ArrayList<Solution> individualsList = new ArrayList<>();
-    individualsList.add(new GreedyFinder().findSolution(problem));
-    for(int i=0; i < populationSize-1; i++){
+//    individualsList.add(new GreedyFinder().findSolution(problem));
+    for(int i=0; i < populationSize; i++){
       individualsList.add(new RandomFinder().findSolution(problem));
     }
     return individualsList;
+  }
+
+  public Population getRecentPopulation() {
+    return recentPopulation;
+  }
+
+  public Research getResearch() {
+    return research;
+  }
+
+  public void setResearch(Research research) {
+    this.research = research;
   }
 }

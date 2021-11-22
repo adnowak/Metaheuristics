@@ -79,7 +79,7 @@ public class Solution {
   public boolean equals(Object object){
     Solution solution = (Solution) object;
     for(int i=0; i<solution.getPathWithoutNulls().length; i++){
-      if(!getPathWithoutNulls()[i].equals(solution.getPathWithoutNulls())){
+      if(!getPathWithoutNulls()[i].equals(solution.getPathWithoutNulls()[i])){
         return false;
       }
     }

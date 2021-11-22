@@ -29,4 +29,9 @@ public class Inversion extends Mutation{
       fixIndividual(solution);
     }
   }
+
+  @Override
+  public double getDefaultProb() {
+    return 1.0;
+  }
 }

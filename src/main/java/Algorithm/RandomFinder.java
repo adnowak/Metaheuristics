@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RandomFinder extends SolutionHeuristicStrategy{
+public class RandomFinder extends SolutionHeuristicStrategy {
   @Override
   public Solution findSolution(Problem problem) {
     City[] cities = new City[problem.getCities().length*2];

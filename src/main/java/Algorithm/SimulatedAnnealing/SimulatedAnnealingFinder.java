@@ -1,7 +1,8 @@
-package Algorithm.TabuSearch;
+package Algorithm.SimulatedAnnealing;
 
 import Algorithm.EvolutionAlgorithm.MutationRelated.Mutation;
 import Algorithm.EvolutionAlgorithm.Population;
+import Algorithm.SimulatedAnnealing.Annealing.Annealing;
 import Algorithm.Solution;
 import Algorithm.SolutionHeuristicStrategy;
 import Data.Research;
@@ -9,20 +10,21 @@ import Model.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class TabooSearchFinder extends SolutionHeuristicStrategy {
+public class SimulatedAnnealingFinder extends SolutionHeuristicStrategy {
   private Research research;
   private int iterationsAmount;
   private int neighbourhoodSize;
-  private int tabooSize;
-  private List<Solution> lastNeighbourhoodList;
+  private Annealing annealingStrategy;
   private Mutation neighbourhoodStrategy;
   private SolutionHeuristicStrategy initiationStrategy;
+  private List<Solution> lastNeighbourhoodList;
 
-  public TabooSearchFinder(int iterationsAmount, int neighbourhoodSize, int tabooSize, Mutation neighbourhoodStrategy, SolutionHeuristicStrategy initiationStrategy) {
+  public SimulatedAnnealingFinder(int iterationsAmount, int neighbourhoodSize, Annealing annealingStrategy, Mutation neighbourhoodStrategy, SolutionHeuristicStrategy initiationStrategy) {
     this.iterationsAmount = iterationsAmount;
     this.neighbourhoodSize = neighbourhoodSize;
-    this.tabooSize = tabooSize;
+    this.annealingStrategy = annealingStrategy;
     this.neighbourhoodStrategy = neighbourhoodStrategy;
     this.initiationStrategy = initiationStrategy;
   }
@@ -32,30 +34,38 @@ public class TabooSearchFinder extends SolutionHeuristicStrategy {
     Solution recentSolution = initiationStrategy.findSolution(problem);
     Solution bestGlobal = recentSolution;
     double recentFitness = recentSolution.getFitness();
-    List<Solution> tabooList = new ArrayList<>();
-    tabooList.add(recentSolution);
+    double temperature;
 
     for(int i=0; i<iterationsAmount; i++){
+      temperature = annealingStrategy.getTemperature(i, iterationsAmount);
       lastNeighbourhoodList = getNeighbourhoodList(recentSolution);
 
-      Solution bestInNeighbourhood = lastNeighbourhoodList.get(0);
-      double bestFitnessInNeighbourhood = bestInNeighbourhood.getFitness();
-      for(int j=1; j<neighbourhoodSize; j++){
-        if(!tabooList.contains(lastNeighbourhoodList.get(j))
-            && lastNeighbourhoodList.get(j).getFitness() < bestFitnessInNeighbourhood){
+      Solution bestInNeighbourhood = null;
+      double bestFitnessInNeighbourhood = 0.0;
+      for(int j=0; j<neighbourhoodSize; j++){
+        if(bestInNeighbourhood == null){
+          bestInNeighbourhood = lastNeighbourhoodList.get(j);
+          bestFitnessInNeighbourhood = bestInNeighbourhood.getFitness();
+        }
+        else if(lastNeighbourhoodList.get(j).getFitness() < bestFitnessInNeighbourhood){
           bestInNeighbourhood = lastNeighbourhoodList.get(j);
           bestFitnessInNeighbourhood = bestInNeighbourhood.getFitness();
         }
       }
 
-      research.addToRecentSolutions(bestInNeighbourhood);
+      research.addToRecentSolutions(recentSolution);
       research.addToBestGlobals(bestGlobal);
-      recentSolution = bestInNeighbourhood;
-      recentFitness = recentSolution.getFitness();
-      if(tabooList.size() == tabooSize){
-        tabooList.remove(0);
+      if(bestInNeighbourhood.getFitness() < recentFitness){
+        recentSolution = bestInNeighbourhood;
+        recentFitness = recentSolution.getFitness();
       }
-      tabooList.add(recentSolution);
+      else {
+//        System.out.println(Math.pow(2.71,(recentFitness-bestInNeighbourhood.getFitness())/temperature));
+        if(new Random().nextDouble() < Math.pow(2.71,(recentFitness-bestInNeighbourhood.getFitness())/temperature)){
+          recentSolution = bestInNeighbourhood;
+          recentFitness = recentSolution.getFitness();
+        }
+      }
 
       if(recentFitness < bestGlobal.getFitness()){
         bestGlobal = recentSolution;
@@ -66,7 +76,7 @@ public class TabooSearchFinder extends SolutionHeuristicStrategy {
       research.addToResearch(new Population(generation));
     }
 
-    return bestGlobal;
+    return recentSolution;
   }
 
   private List<Solution> getNeighbourhoodList(Solution solution){
@@ -85,10 +95,6 @@ public class TabooSearchFinder extends SolutionHeuristicStrategy {
     return research;
   }
 
-  public void setResearch(Research research) {
-    this.research = research;
-  }
-
   public List<Solution> getLastNeighbourhoodList() {
     return lastNeighbourhoodList;
   }
@@ -101,15 +107,15 @@ public class TabooSearchFinder extends SolutionHeuristicStrategy {
     return neighbourhoodSize;
   }
 
-  public int getTabooSize() {
-    return tabooSize;
+  public Annealing getAnnealingStrategy() {
+    return annealingStrategy;
   }
 
   public Mutation getNeighbourhoodStrategy() {
     return neighbourhoodStrategy;
   }
 
-  public SolutionHeuristicStrategy getInitiationStrategy() {
-    return initiationStrategy;
+  public void setResearch(Research research) {
+    this.research = research;
   }
 }

@@ -1,21 +1,23 @@
+import Algorithm.EvolutionAlgorithm.Population;
 import Data.Loader;
+import Model.City;
 import Model.Problem;
 import Algorithm.RandomFinder;
 import Algorithm.Solution;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 public class RandomFinderTest {
   private void runTest(Problem problem){
-    int runsAmount = 10000;
-    double distanceSum = 0;
-    Solution solution = null;
-    for(int i=0; i<runsAmount; i++){
-      solution = new RandomFinder().findSolution(problem);
-      distanceSum += solution.getFitness();
+    int populationSize = 10000;
+    ArrayList<Solution> solutions = new ArrayList<>();
+    for(int i=0; i<populationSize; i++){
+      solutions.add(new RandomFinder().findSolution(problem));
     }
+    Population population = new Population(solutions);
 
-    System.out.println("Last path: "+solution.getPathWithDemandString());
-    System.out.println("Average distance: "+distanceSum/runsAmount);
+    System.out.println(population.getBestIndividual().getFitness()+";"+population.getAverageFitness()+";"+population.getWorstIndividual().getFitness()+";"+population.getStandardDeviation());
   }
 
   @Test
@@ -26,5 +28,30 @@ public class RandomFinderTest {
   @Test
   public void findSolutionN37K6Test(){
     runTest(new Loader("src/main/resources/A-n37-k6.txt").loadProblem());
+  }
+
+  @Test
+  public void findSolutionN39K5Test(){
+    runTest(new Loader("src/main/resources/A-n39-k5.txt").loadProblem());
+  }
+
+  @Test
+  public void findSolutionN45K6Test(){
+    runTest(new Loader("src/main/resources/A-n45-k6.txt").loadProblem());
+  }
+
+  @Test
+  public void findSolutionN48K7Test(){
+    runTest(new Loader("src/main/resources/A-n48-k7.txt").loadProblem());
+  }
+
+  @Test
+  public void findSolutionN54K7Test(){
+    runTest(new Loader("src/main/resources/A-n54-k7.txt").loadProblem());
+  }
+
+  @Test
+  public void findSolutionN60K9Test(){
+    runTest(new Loader("src/main/resources/A-n60-k9.txt").loadProblem());
   }
 }

@@ -4,11 +4,10 @@ import Model.City;
 import Model.Problem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class GreedyFinder extends SolutionHeuristicStrategy{
+public class GreedyFinder extends SolutionHeuristicStrategy {
   @Override
   public Solution findSolution(Problem problem) {
     City[] cities;
